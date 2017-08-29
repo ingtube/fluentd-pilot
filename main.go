@@ -5,7 +5,7 @@ import (
 	"io/ioutil"
 	"os"
 
-	"github.com/ingtube/fluentd-pilot/pilot"
+	"github.com/ingtube/fluentd_pilot/pilot"
 	log "github.com/sirupsen/logrus"
 )
 
