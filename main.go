@@ -2,44 +2,34 @@ package main
 
 import (
 	"flag"
-	log "github.com/Sirupsen/logrus"
-	"github.com/AliyunContainerService/fluentd-pilot/pilot"
 	"io/ioutil"
 	"os"
-	"path/filepath"
+
+	"github.com/ingtube/fluentd-pilot/pilot"
+	log "github.com/sirupsen/logrus"
 )
 
 func main() {
-
-	template := flag.String("template", "", "Template filepath for fluentd.")
-	base := flag.String("base", "", "Directory which mount host root.")
-	level := flag.String("log-level", "INFO", "Log level")
+	template := flag.String("template", "", "Fluentd 配置文件模板")
+	level := flag.String("log-level", "INFO", "日志级别")
 	flag.Parse()
 
-	baseDir, err := filepath.Abs(*base)
-	if err != nil {
-		panic(err)
-	}
-
-	if baseDir == "/" {
-		baseDir = ""
-	}
-
 	if *template == "" {
-		panic("template file can not be emtpy")
+		log.Fatalf("Fluentd 配置文件模板未设置")
 	}
 
 	log.SetOutput(os.Stdout)
 	logLevel, err := log.ParseLevel(*level)
 	if err != nil {
-		panic(err)
+		log.Fatalf("解析日志级别失败：%s", err.Error())
 	}
 	log.SetLevel(logLevel)
+	log.SetFormatter(&log.JSONFormatter{})
 
 	b, err := ioutil.ReadFile(*template)
 	if err != nil {
-		panic(err)
+		log.Fatalf("读取 fluentd 配置模板失败：%s", err)
 	}
 
-	log.Fatal(pilot.Run(string(b), baseDir))
+	log.Fatal(pilot.Run(string(b)))
 }
